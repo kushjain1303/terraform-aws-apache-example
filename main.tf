@@ -3,6 +3,10 @@ data "aws_vpc" "main" {
   id = var.vpc_id
 }
 
+data "aws_subnet" "subnet_ids" {
+  id = tolist(data.aws_subnet.subnet_ids.id)[0]
+}
+
 resource "aws_security_group" "my_sec_group" {
   name        = "my_sec_group"
   description = "Terraform provisioner hands on"
@@ -76,6 +80,7 @@ data "aws_ami" "my_ami" {
 
 resource "aws_instance" "my_provisioners" {
   ami                    = "${data.aws_ami.my_ami.id}"
+  subnet_id = data.aws_subnet.subnet_ids.id
   instance_type          = var.instance_type
   key_name               = aws_key_pair.deployer.key_name
   vpc_security_group_ids = [aws_security_group.my_sec_group.id]
